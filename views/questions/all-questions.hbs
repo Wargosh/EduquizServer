@@ -1,0 +1,14 @@
+<div class="row">
+    {{#each questions}}
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-tittle">{{question}}</h4>
+                {{#each this.options}}
+                <h5>{{this.option}}</h5>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>

@@ -1,0 +1,57 @@
+{{#each errors}}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{text}}</strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{{/each}}
+
+<div class="col-md-8 mx-auto">
+    <div class="card">
+        <div class="card-header">
+            <h3>Nueva pregunta</h3>
+        </div>
+        <div class="card-body">
+            <form action="/questions/new-question" method="POST">
+                <div class="form-group">
+                    <h4>Pregunta:</h4>
+                    <textarea name="_question" rows="2" maxlength="150" class="form-control"
+                        placeholder="Escribe una pregunta" autofocus>{{_question}}</textarea>
+                </div>
+                <div class="form-group">
+                    <input type="file" name="_imgQuestion">
+                </div>
+                <div class="form-group">
+                    <option value=""></option>
+                </div>
+
+                <div class="form-group">
+                    <h4>Opciones:</h4>
+                    <input type="text" name="_option1" class="form-control" placeholder="Opcion correcta"
+                        value="{{_option1}}">
+                    <input type="text" name="_option2" class="form-control" placeholder="Segunda opcion"
+                        value="{{_option2}}">
+                    <input type="text" name="_option3" class="form-control" placeholder="Tercera opcion"
+                        value="{{_option3}}">
+                    <input type="text" name="_option4" class="form-control" placeholder="Cuarta opcion"
+                        value="{{_option4}}">
+                </div>
+                <div class="form-group">
+                    <h4>Categoria:</h4>
+                    <div class="list-group">
+                        <button type="button" class="list-group-item list-group-item-action">Matematicas</button>
+                        <button type="button" class="list-group-item list-group-item-action">Astronomia</button>
+                        <button type="button" class="list-group-item list-group-item-action">Literatura</button>
+                        <button type="button" class="list-group-item list-group-item-action">Entretenimiento</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block" type="submit">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
