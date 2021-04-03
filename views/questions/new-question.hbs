@@ -23,29 +23,52 @@
                     <input type="file" name="_imgQuestion">
                 </div>
                 <div class="form-group">
-                    <option value=""></option>
+                    <h4>Categoria:</h4>
+                    <select class="custom-select mr-sm-2" name="_category">
+                        {{#if _category}}
+                        <option selected>{{_category}}</option>
+                        {{else}}
+                        <option selected>Elegir categoría</option>
+                        {{/if}}
+                        <option value="Matemáticas">Matemáticas</option>
+                        <option value="Astronomía">Astronomía</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Historia">Historia</option>
+                        <option value="Literatura">Literatura</option>
+                        <option value="Música">Música</option>
+                        <option value="Geografía">Geografía</option>
+                        <option value="Deporte">Deporte</option>
+                    </select>
                 </div>
-
                 <div class="form-group">
                     <h4>Opciones:</h4>
-                    <input type="text" name="_option1" class="form-control" placeholder="Opcion correcta"
-                        value="{{_option1}}">
-                    <input type="text" name="_option2" class="form-control" placeholder="Segunda opcion"
-                        value="{{_option2}}">
-                    <input type="text" name="_option3" class="form-control" placeholder="Tercera opcion"
-                        value="{{_option3}}">
-                    <input type="text" name="_option4" class="form-control" placeholder="Cuarta opcion"
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                        <input type="checkbox" class="custom-control-input" id="_option1id" checked disabled>
+                        <label class="custom-control-label" for="_option1id">Opcion correcta:</label>
+                    </div>
+                    <input type="text" name="_option1" for="_option1id" class="form-control"
+                        placeholder="Primera opcion" value="{{_option1}}">
+                    <br>
+
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                        <input type="checkbox" class="custom-control-input" id="_option2id" name="_statusOp2">
+                        <label class="custom-control-label" for="_option2id">Segunda opcion (opcional
+                            correcta):</label>
+                    </div>
+                    <input type="text" name="_option2" for="_option2id" class="form-control"
+                        placeholder="Segunda opcion" value="{{_option2}}">
+                    <br>
+
+                    <label class="custom-control-label" for="_option3id">Tercera opcion:</label>
+                    <input type="text" name="_option3" for="_option3id" class="form-control"
+                        placeholder="Tercera opcion" value="{{_option3}}">
+                    <br>
+
+                    <label class="custom-control-label" for="_option4id">Cuarta opcion:</label>
+                    <input type="text" name="_option4" for="_option4id" class="form-control" placeholder="Cuarta opcion"
                         value="{{_option4}}">
                 </div>
-                <div class="form-group">
-                    <h4>Categoria:</h4>
-                    <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-action">Matematicas</button>
-                        <button type="button" class="list-group-item list-group-item-action">Astronomia</button>
-                        <button type="button" class="list-group-item list-group-item-action">Literatura</button>
-                        <button type="button" class="list-group-item list-group-item-action">Entretenimiento</button>
-                    </div>
-                </div>
+
                 <div class="form-group">
                     <button class="btn btn-primary btn-block" type="submit">
                         Guardar

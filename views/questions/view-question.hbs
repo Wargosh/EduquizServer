@@ -1,0 +1,40 @@
+<div class="col-md-7 mx-auto">
+    <div class="card border-success">
+        {{#if this.images}}
+        <img class="card-img-top" src="..." alt="Card image cap">
+        {{/if}}
+        <div class="card-body">
+
+            <form action="/" method="post">
+                <h4>Pregunta:</h4>
+                <textarea name="_question" rows="2" maxlength="150" class="form-control"
+                    placeholder="Escribe una pregunta">{{questions.question}}</textarea>
+                <h4>Opciones:</h4>
+
+                <input type="text" name="_option1" class="form-control" value="{{questions.options.[0].option}}">
+                <input type="text" name="_option2" class="form-control" value="{{questions.options.[1].option}}">
+                <input type="text" name="_option3" class="form-control" value="{{questions.options.[2].option}}">
+                <input type="text" name="_option4" class="form-control" value="{{questions.options.[3].option}}">
+            </form>
+
+
+            <h4 class="card-tittle text-center"><b>{{questions.question}}</b></h4>
+            <hr>
+            <h5><span class="badge badge-success">Matematicas</span></h5>
+            <br>
+            <div class="text-center">
+                <a href="/questions/view-question/{{_id}}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-edit"></i> Actualizar
+                </a>
+                <a href="/questions/view-question/{{_id}}" class="btn btn-danger btn-lg">
+                    <i class="fas fa-trash"></i> Eliminar
+                </a>
+            </div>
+
+        </div>
+        <div class="card-footer text-muted">
+            <p class="card-text"><small class="text-muted">Ultima modificacion {{questions.timeAgo}}.</small></p>
+        </div>
+    </div>
+
+</div>

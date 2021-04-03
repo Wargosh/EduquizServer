@@ -67,8 +67,8 @@ var players = [];
 
 // websockets
 io.on('connection', (socket) => {
-  //const thisPlayerId = shortid.generate();
-  const thisPlayerId = socket.id;
+  const thisPlayerId = shortid.generate();
+  //const thisPlayerId = socket.id;
   console.log('new connection. ID Socket:' + socket.id + " ID: " + thisPlayerId);
 
   var player = {

@@ -1,13 +1,38 @@
 <div class="row">
     {{#each questions}}
-    <div class="col-md-3">
-        <div class="card">
+    <div class="col-md-4">
+        <div class="card border-success">
+            {{#if this.images}}
+            <img class="card-img-top" src="..." alt="Card image cap">
+            {{/if}}
             <div class="card-body">
-                <h4 class="card-tittle">{{question}}</h4>
+                <h4 class="card-tittle text-center"><b>{{question}}</b></h4>
+                <hr>
+                <h5><span class="badge badge-success">{{category}}</span></h5>
+                <h6 class="card-subtitle mb-2 text-muted">Respuesta(s) correcta(s):</h6>
                 {{#each this.options}}
-                <h5>{{this.option}}</h5>
+
+                {{#if this.status}}
+                <h6 class="card-text text-center">{{this.option}}</h6>
+                {{/if}}
+
                 {{/each}}
+                <br>
+                <a href="/questions/view-question/{{_id}}" class="btn btn-primary btn-block btn-sm">
+                    <i class="fas fa-poll-h"></i> Ver completa
+                </a>
             </div>
+            <div class="card-footer text-muted">
+                <p class="card-text"><small class="text-muted">Ultima modificacion {{timeAgo}}.</small></p>
+            </div>
+        </div>
+    </div>
+
+    {{else}}
+    <div class="card mx-auto">
+        <div class="card-body">
+            <p class="lead">No existen preguntas aun.</p>
+            <a href="/questions/add" class="btn btn-primary btn-block">Crear pregunta</a>
         </div>
     </div>
     {{/each}}
