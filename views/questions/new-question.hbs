@@ -1,26 +1,22 @@
-{{#each errors}}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{text}}</strong>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-{{/each}}
-
 <div class="col-md-8 mx-auto">
     <div class="card">
         <div class="card-header">
             <h3>Nueva pregunta</h3>
         </div>
         <div class="card-body">
-            <form action="/questions/new-question" method="POST">
+            <form action="/questions/new-question" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <h4>Pregunta:</h4>
                     <textarea name="_question" rows="2" maxlength="150" class="form-control"
                         placeholder="Escribe una pregunta" autofocus>{{_question}}</textarea>
                 </div>
-                <div class="form-group">
-                    <input type="file" name="_imgQuestion">
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" name="image" id="image" onchange="preview_image(event)"
+                            class="custom-file-input" aria-describedby="inputGroupFileAddon">
+                        <label for="image" class="custom-file-label">Elige una imagen (opcional)</label>
+                    </div>
+                    <img id="imgPreview" src="#" alt="" class="img-fluid rounded" />
                 </div>
                 <div class="form-group">
                     <h4>Categoria:</h4>
@@ -30,14 +26,16 @@
                         {{else}}
                         <option selected>Elegir categoría</option>
                         {{/if}}
-                        <option value="Matemáticas">Matemáticas</option>
                         <option value="Astronomía">Astronomía</option>
+                        <option value="Ciencia">Ciencia</option>
+                        <option value="Deporte">Deporte</option>
                         <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Fisica">Fisica</option>
+                        <option value="Geografía">Geografía</option>
                         <option value="Historia">Historia</option>
                         <option value="Literatura">Literatura</option>
+                        <option value="Matemáticas">Matemáticas</option>
                         <option value="Música">Música</option>
-                        <option value="Geografía">Geografía</option>
-                        <option value="Deporte">Deporte</option>
                     </select>
                 </div>
                 <div class="form-group">

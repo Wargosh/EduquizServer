@@ -1,40 +1,85 @@
-<div class="col-md-7 mx-auto">
+<div class="col-md-8 mx-auto">
     <div class="card border-success">
-        {{#if this.images}}
-        <img class="card-img-top" src="..." alt="Card image cap">
-        {{/if}}
+        <div class="card-header">
+            <h3 class="card-tittle d-flex justify-content-between align-items-center">Pregunta
+                <form action="/questions/remove-question/{{questions._id}}?_method=DELETE" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger btn-md">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </h3>
+        </div>
         <div class="card-body">
+            <form action="/questions/update-question/{{questions._id}}?_method=PUT" method="POST">
+                <div class="form-group">
+                    <h4>Pregunta:</h4>
+                    <input type="hidden" name="_method" value="PUT">
+                    <textarea name="_question" rows="2" maxlength="150" class="form-control"
+                        placeholder="Escribe una pregunta" autofocus>{{questions.question}}</textarea>
+                </div>
+                <div class="form-group">
+                    <input type="file" name="_imgQuestion">
+                </div>
+                <div class="form-group">
+                    <h4>Categoria:</h4>
+                    <select class="custom-select mr-sm-2" name="_category">
+                        {{#if questions.category}}
+                        <option selected>{{questions.category}}</option>
+                        {{else}}
+                        <option selected>Elegir categoría</option>
+                        {{/if}}
+                        <option value="Astronomía">Astronomía</option>
+                        <option value="Ciencia">Ciencia</option>
+                        <option value="Deporte">Deporte</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Fisica">Fisica</option>
+                        <option value="Geografía">Geografía</option>
+                        <option value="Historia">Historia</option>
+                        <option value="Literatura">Literatura</option>
+                        <option value="Matemáticas">Matemáticas</option>
+                        <option value="Música">Música</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <h4>Opciones:</h4>
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                        <input type="checkbox" class="custom-control-input" id="_option1id" checked disabled>
+                        <label class="custom-control-label" for="_option1id">Opción correcta:</label>
+                    </div>
+                    <input type="text" name="_option1" for="_option1id" class="form-control"
+                        placeholder="Primera opcion" value="{{questions.options.[0].option}}">
+                    <br>
 
-            <form action="/" method="post">
-                <h4>Pregunta:</h4>
-                <textarea name="_question" rows="2" maxlength="150" class="form-control"
-                    placeholder="Escribe una pregunta">{{questions.question}}</textarea>
-                <h4>Opciones:</h4>
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                        <input type="checkbox" class="custom-control-input" id="_option2id" name="_statusOp2" {{#if
+                            questions.options.[1].status}} checked {{/if}}>
+                        <label class="custom-control-label" for="_option2id">Segunda opción (opcional
+                            correcta):</label>
+                    </div>
+                    <input type="text" name="_option2" for="_option2id" class="form-control"
+                        placeholder="Segunda opcion" value="{{questions.options.[1].option}}">
+                    <br>
 
-                <input type="text" name="_option1" class="form-control" value="{{questions.options.[0].option}}">
-                <input type="text" name="_option2" class="form-control" value="{{questions.options.[1].option}}">
-                <input type="text" name="_option3" class="form-control" value="{{questions.options.[2].option}}">
-                <input type="text" name="_option4" class="form-control" value="{{questions.options.[3].option}}">
+                    <label class="custom-control-label" for="_option3id">Tercera opción:</label>
+                    <input type="text" name="_option3" for="_option3id" class="form-control"
+                        placeholder="Tercera opcion" value="{{questions.options.[2].option}}">
+                    <br>
+
+                    <label class="custom-control-label" for="_option4id">Cuarta opción:</label>
+                    <input type="text" name="_option4" for="_option4id" class="form-control" placeholder="Cuarta opcion"
+                        value="{{questions.options.[3].option}}">
+                </div>
+
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-edit"></i> Actualizar
+                    </button>
+                </div>
             </form>
-
-
-            <h4 class="card-tittle text-center"><b>{{questions.question}}</b></h4>
-            <hr>
-            <h5><span class="badge badge-success">Matematicas</span></h5>
-            <br>
-            <div class="text-center">
-                <a href="/questions/view-question/{{_id}}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-edit"></i> Actualizar
-                </a>
-                <a href="/questions/view-question/{{_id}}" class="btn btn-danger btn-lg">
-                    <i class="fas fa-trash"></i> Eliminar
-                </a>
-            </div>
-
         </div>
         <div class="card-footer text-muted">
-            <p class="card-text"><small class="text-muted">Ultima modificacion {{questions.timeAgo}}.</small></p>
+            <p class="card-text"><small class="text-muted">Última modificación {{questions.timeAgo}}.</small></p>
         </div>
     </div>
-
 </div>
