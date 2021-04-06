@@ -2,13 +2,17 @@
 
 const path = require('path');
 const express = require('express');
-const app = express();
 const exphbs = require('express-handlebars');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const shortid = require('shortid'); // genera ids aleatorios cortos
 const multer = require('multer');
 const flash = require('connect-flash');
+const passport = require('passport');
+
+// Inicializaciones
+const app = express();
+require('./config/passport');
 
 // config
 app.set('port', process.env.PORT || 3000);
@@ -34,12 +38,21 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
-app.use(flash()); 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
 // Variables globales
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
-  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error_msg = req.flash('error_msg'); // errores recopilados generales
+  res.locals.error = req.flash('error'); // muestra los errores que se pueden producir con passport durante la autenticacion
+  if (req.user === undefined) {
+    res.locals.user = null;
+  } else {
+    res.locals.user = req.user.toJSON();
+  }
+  //res.locals.user = req.user.toJSON() || null;
 
   next();
 });
@@ -104,7 +117,7 @@ io.on('connection', (socket) => {
   socket.on('questions:get', async function () {
     const questions = await Question.find();
     console.log('buscando preguntas');
-    io.emit('questions:get', {questions});
+    io.emit('questions:get', { questions });
   });
 
   socket.on('click', function () {

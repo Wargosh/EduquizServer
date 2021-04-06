@@ -1,9 +1,9 @@
 <div class="row">
     {{#each questions}}
-    <div class="col-md-4">
+    <div class="col-md-4 pt-4">
         <div class="card border-success">
             {{#if this.images}}
-            <img class="card-img-top" src="..." alt="Card image cap">
+            <img class="card-img-top" src="/upload/questions/{{images.[0]}}" alt="Card image cap">
             {{/if}}
             <div class="card-body">
                 <h4 class="card-tittle text-center"><b>{{question}}</b></h4>
@@ -17,10 +17,12 @@
                 {{/if}}
 
                 {{/each}}
+                {{#if user}}
                 <br>
                 <a href="/questions/view-question/{{_id}}" class="btn btn-primary btn-block btn-sm">
                     <i class="fas fa-poll-h"></i> Ver completa
                 </a>
+                {{/if}}
             </div>
             <div class="card-footer text-muted">
                 <p class="card-text"><small class="text-muted">Ultima modificación {{timeAgo}}.</small></p>

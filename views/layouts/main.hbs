@@ -17,18 +17,11 @@
 </head>
 
 <body>
-    <p>Navigation</p>
-    <main class="container">
-        {{> messages}}
-        {{#each errors}}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>{{text}}</strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {{/each}}
-
+    {{> navigation }}
+    <main class="container p-4">
+        {{> messages }}
+        {{> errors }}
+        
         {{{ body }}}
     </main>
 
