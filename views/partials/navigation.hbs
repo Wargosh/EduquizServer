@@ -14,22 +14,19 @@
                     <a class="nav-link" href="/">Inicio <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/questions">Preguntas</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="/about">Información</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
-                {{#if user}}
+                {{#if user_p}}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{user.username}}
+                        {{user_p.username}}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/questions/add">Nueva pregunta</a>
-                        <a class="dropdown-item" href="/questions">Ver preguntas</a>
+                        <a class="dropdown-item" href="/questions/add">Nueva Pregunta</a>
+                        <a class="dropdown-item" href="/questions/my-questions">Mis Preguntas</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout">Cerrar Sesión</a>
                     </div>

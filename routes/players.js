@@ -46,7 +46,7 @@ router.get('/login', (req, res) => {
 
 // Validar inicio de sesion de la cuenta
 router.post('/login', passport.authenticate('local', {
-    successRedirect: '/questions',
+    successRedirect: '/questions/my-questions',
     failureRedirect: '/login',
     failureFlash: true
 }));

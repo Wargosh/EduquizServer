@@ -6,8 +6,8 @@ const path = require('path');
 const { randomString } = require('../helpers/libs');
 const { isAuthenticated } = require('../helpers/auth');
 
-// Listar preguntas
-router.get('/questions', async (req, res) => {
+// Listar TODAS preguntas
+/*router.get('/questions', async (req, res) => {
     const questions = await Question.find((err, docs) => {
         if (err)
             console.log('Error in retrieving employee list :' + err);
@@ -25,6 +25,52 @@ router.get('/questions', async (req, res) => {
     } else {
         res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas' });
     }
+});*/
+
+router.get('/getRandomQuestions', async (req, res) => {
+    /*await Question.count().exec(function (err, count) {
+
+        const random = Math.floor(Math.random() * count);
+
+        Question.find().skip(random).limit(5).lean().exec(
+            function (err, result) {
+                const questions =  result ;
+                console.log('ramdon we ' + questions);
+                res.render("questions/all-questions", {
+                    questions
+                });
+            });
+    });*/
+    const questions = await Question.aggregate([
+        { $match: { status: 'active' } }, // filter the results
+        { $sample: { size: 5 } } // You want to get 5 docs
+    ]);
+
+    res.render("questions/all-questions", {
+        questions: questions
+    });
+    //res.send({ questions: questions });
+});
+
+// Listar mis preguntas
+router.get('/questions/my-questions', isAuthenticated, async (req, res) => {
+    const questions = await Question.find({ user: req.user.id }, (err, docs) => {
+        if (err)
+            console.log('Error in retrieving employee list :' + err);
+    }).sort({ updated_at: 'desc' }).lean(); // It is prevent the warning when trying to display records
+
+    // agregar el tiempo de registro (ultima modificacion)
+    if (questions) {
+        for (var i in questions) { // recorre los jugadores encontrados
+            // establece un string temporal que menciona el ultimo acceso del mensaje
+            questions[i].timeAgo = helpers.timeago(Date.parse(questions[i].updated_at));
+        }
+        res.render("questions/all-questions", {
+            questions: questions
+        });
+    } else {
+        res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas' });
+    }
 });
 
 // Mostrar vista de agregar nueva pregunta
@@ -34,10 +80,14 @@ router.get('/questions/add', isAuthenticated, (req, res) => {
 
 // Agregar nueva pregunta
 router.post('/questions/new-question', isAuthenticated, async (req, res) => {
-    console.log(req.body);
-    const { _question, _option1, _option2, _option3, _option4, _category } = req.body;
+    let { _question, _option1, _option2, _option3, _option4, _category } = req.body;
     const errors = [];
     const category = _category;
+    _question = _question.trim();
+    _option1 = _option1.trim();
+    _option2 = _option2.trim();
+    _option3 = _option3.trim();
+    _option4 = _option4.trim();
     if (_category == 'Elegir categoría')
         errors.push({ text: 'Selecciona una categoría.' });
 
@@ -107,12 +157,13 @@ router.post('/questions/new-question', isAuthenticated, async (req, res) => {
                     images.push(imgURL + ext);
 
                     const newQuestion = new Question({ question, images, category, options });
+                    newQuestion.user = req.user.id;
                     console.log(newQuestion);
                     await newQuestion.save();
 
                     req.flash('success_msg', 'Se ha almacenado exitosamente tu pregunta.');
                 }
-                res.redirect('/questions');
+                res.redirect('/questions/my-questions');
             } else {
                 await fs.unlink(imageTempPath);
                 req.flash('error_msg', 'Solo puedes subir archivos en formato .PNG .JPG.');
@@ -127,14 +178,15 @@ router.post('/questions/new-question', isAuthenticated, async (req, res) => {
             if (req.file.originalname !== undefined)
                 saveImage();
         } catch (error) {
-            console.log("PREGUNTA ENVIADA SIN IMAGEN = " + error);
+            console.log("PREGUNTA ENVIADA SIN SUBIR IMAGEN = " + error);
 
             const newQuestion = new Question({ question, images, category, options });
+            newQuestion.user = req.user.id;
             console.log(newQuestion);
             await newQuestion.save();
 
             req.flash('success_msg', 'Se ha almacenado exitosamente tu pregunta.');
-            res.redirect('/questions');
+            res.redirect('/questions/my-questions');
         }
     }
 });
@@ -160,9 +212,13 @@ router.get('/questions/view-question/:id', isAuthenticated, async (req, res) => 
 
 // Actualizar informacion de una pregunta
 router.put('/questions/update-question/:id', isAuthenticated, async (req, res) => {
-    const { _question, _option1, _option2, _option3, _option4, _category } = req.body;
-
+    let { _question, _option1, _option2, _option3, _option4, _category } = req.body;
     const images = [];
+    _question = _question.trim();
+    _option1 = _option1.trim();
+    _option2 = _option2.trim();
+    _option3 = _option3.trim();
+    _option4 = _option4.trim();
     let checkedValue = req.body['_statusOp2'];
     let op2Status = false;
     if (checkedValue != undefined) {
@@ -213,12 +269,12 @@ router.put('/questions/update-question/:id', isAuthenticated, async (req, res) =
 
                 req.flash('success_msg', 'Se ha actualizado la pregunta con exito.');
             }
-            res.redirect('/questions');
+            res.redirect('/questions/my-questions');
         } else {
             await fs.unlink(imageTempPath);
             req.flash('error_msg', 'Solo puedes subir archivos en formato .PNG .JPG.');
             // Recargar misma pagina con los datos
-            res.render('questions/new-question', {
+            res.render('questions/view-question', {
                 errors, _question, _option1, _option2, _option3, _option4, _category
             });
         }
@@ -241,7 +297,7 @@ router.put('/questions/update-question/:id', isAuthenticated, async (req, res) =
         });
 
         req.flash('success_msg', 'Se ha actualizado la pregunta con exito.');
-        res.redirect('/questions');
+        res.redirect('/questions/my-questions');
     }
 });
 
@@ -259,7 +315,7 @@ router.delete('/questions/remove-question/:id', isAuthenticated, async (req, res
 
     await Question.findByIdAndDelete(req.params.id);
     req.flash('success_msg', 'Se ha eliminado la pregunta correctamente.');
-    res.redirect('/questions');
+    res.redirect('/questions/my-questions');
 });
 
 module.exports = router;

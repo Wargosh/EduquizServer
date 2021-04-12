@@ -17,12 +17,10 @@
                 {{/if}}
 
                 {{/each}}
-                {{#if user}}
                 <br>
-                <a href="/questions/view-question/{{_id}}" class="btn btn-primary btn-block btn-sm">
+                <a href="/questions/view-question/{{this._id}}" class="btn btn-primary btn-block btn-sm">
                     <i class="fas fa-poll-h"></i> Ver completa
                 </a>
-                {{/if}}
             </div>
             <div class="card-footer text-muted">
                 <p class="card-text"><small class="text-muted">Ultima modificación {{timeAgo}}.</small></p>

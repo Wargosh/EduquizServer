@@ -47,12 +47,15 @@ app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg'); // errores recopilados generales
   res.locals.error = req.flash('error'); // muestra los errores que se pueden producir con passport durante la autenticacion
-  if (req.user === undefined) {
-    res.locals.user = null;
-  } else {
-    res.locals.user = req.user.toJSON();
+  res.locals.user_p = null;
+  try {
+    if (req.user !== undefined) {
+      res.locals.user_p = req.user.toJSON();
+    }
+  } catch (error) {
+    console.log('error no se pudo obtener req.user: ' + error);
   }
-  //res.locals.user = req.user.toJSON() || null;
+  //res.locals.user = req.user || null;
 
   next();
 });
