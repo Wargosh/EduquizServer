@@ -9,22 +9,18 @@
                 <h4 class="card-tittle text-center"><b>{{question}}</b></h4>
                 <hr>
                 <h5><span class="badge badge-success">{{category}}</span></h5>
-                <ul class="list-group border border-info">
-                    {{#each this.options}}
+                <h6 class="card-subtitle mb-2 text-muted">Respuesta(s) correcta(s):</h6>
+                {{#each this.options}}
 
-                    {{#if this.status}}
-                    <li class="list-group-item list-group-item-success">
-                        <h6 class="card-text text-center">{{this.option}}</h6>
-                    </li>
-                    {{else}}
-                    <li class="list-group-item">
-                        <h6 class="card-text text-center">{{this.option}}</h6>
-                    </li>
-                    {{/if}}
+                {{#if this.status}}
+                <h6 class="card-text text-center">{{this.option}}</h6>
+                {{/if}}
 
-                    {{/each}}
-                </ul>
+                {{/each}}
                 <br>
+                <a href="/questions/view-question/{{this._id}}" class="btn btn-primary btn-block btn-sm">
+                    <i class="fas fa-poll-h"></i> Ver completa
+                </a>
             </div>
             <div class="card-footer text-muted">
                 <p class="card-text"><small class="text-muted">Ultima modificación {{timeAgo}}.</small></p>

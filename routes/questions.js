@@ -7,46 +7,36 @@ const { randomString } = require('../helpers/libs');
 const { isAuthenticated } = require('../helpers/auth');
 
 // Listar TODAS preguntas
-/*router.get('/questions', async (req, res) => {
+router.get('/questions', async (req, res) => {
     const questions = await Question.find((err, docs) => {
         if (err)
             console.log('Error in retrieving employee list :' + err);
     }).sort({ updated_at: 'desc' }).lean(); // It is prevent the warning when trying to display records
+    
 
     // agregar el tiempo de registro (ultima modificacion)
     if (questions) {
         for (var i in questions) { // recorre los jugadores encontrados
             // establece un string temporal que menciona el ultimo acceso del mensaje
             questions[i].timeAgo = helpers.timeago(Date.parse(questions[i].updated_at));
+            questions[i]._id = ""; // evita enviar el id a usuarios anonimos
         }
+        console.log(questions);
         res.render("questions/all-questions", {
             questions: questions,
         });
     } else {
         res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas' });
     }
-});*/
+});
 
 router.get('/getRandomQuestions', async (req, res) => {
-    /*await Question.count().exec(function (err, count) {
-
-        const random = Math.floor(Math.random() * count);
-
-        Question.find().skip(random).limit(5).lean().exec(
-            function (err, result) {
-                const questions =  result ;
-                console.log('ramdon we ' + questions);
-                res.render("questions/all-questions", {
-                    questions
-                });
-            });
-    });*/
     const questions = await Question.aggregate([
-        { $match: { status: 'active' } }, // filter the results
-        { $sample: { size: 5 } } // You want to get 5 docs
+        { $match: { status: 'active' } }, // filtrar los resultados
+        { $sample: { size: 7 } } // Cantidad de documentos
     ]);
 
-    res.render("questions/all-questions", {
+    res.render("questions/my-questions", {
         questions: questions
     });
     //res.send({ questions: questions });
@@ -65,7 +55,7 @@ router.get('/questions/my-questions', isAuthenticated, async (req, res) => {
             // establece un string temporal que menciona el ultimo acceso del mensaje
             questions[i].timeAgo = helpers.timeago(Date.parse(questions[i].updated_at));
         }
-        res.render("questions/all-questions", {
+        res.render("questions/my-questions", {
             questions: questions
         });
     } else {

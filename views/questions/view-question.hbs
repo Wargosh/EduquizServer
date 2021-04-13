@@ -16,7 +16,7 @@
                     <h4>Pregunta:</h4>
                     <input type="hidden" name="_method" value="PUT">
                     <textarea name="_question" rows="2" maxlength="150" class="form-control"
-                        placeholder="Escribe una pregunta" autofocus>{{questions.question}}</textarea>
+                        placeholder="Escribe una pregunta" autofocus required>{{questions.question}}</textarea>
                 </div>
                 <div class="input-group">
                     <div class="custom-file">
@@ -59,7 +59,7 @@
                         <label class="custom-control-label" for="_option1id">Opción correcta:</label>
                     </div>
                     <input type="text" name="_option1" for="_option1id" class="form-control"
-                        placeholder="Primera opcion" value="{{questions.options.[0].option}}">
+                        placeholder="Primera opcion" value="{{questions.options.[0].option}}" required>
                     <br>
 
                     <div class="custom-control custom-checkbox mr-sm-2">
@@ -69,17 +69,17 @@
                             correcta):</label>
                     </div>
                     <input type="text" name="_option2" for="_option2id" class="form-control"
-                        placeholder="Segunda opcion" value="{{questions.options.[1].option}}">
+                        placeholder="Segunda opcion" value="{{questions.options.[1].option}}" required>
                     <br>
 
                     <label class="custom-control-label" for="_option3id">Tercera opción:</label>
                     <input type="text" name="_option3" for="_option3id" class="form-control"
-                        placeholder="Tercera opcion" value="{{questions.options.[2].option}}">
+                        placeholder="Tercera opcion" value="{{questions.options.[2].option}}" required>
                     <br>
 
                     <label class="custom-control-label" for="_option4id">Cuarta opción:</label>
                     <input type="text" name="_option4" for="_option4id" class="form-control" placeholder="Cuarta opcion"
-                        value="{{questions.options.[3].option}}">
+                        value="{{questions.options.[3].option}}" required>
                 </div>
 
                 <div class="form-group text-center">
