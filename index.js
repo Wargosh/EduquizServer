@@ -118,7 +118,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('questions:get', async function () {
-    const questions = await Question.find();
+    //const questions = await Question.find();
+    // Preguntas aleatorias
+    const questions = await Question.aggregate([
+      { $match: { status: 'active' } }, // filtrar los resultados
+      { $sample: { size: 7 } } // Cantidad de documentos
+    ]);
+
     console.log('buscando preguntas');
     io.emit('questions:get', { questions });
   });
