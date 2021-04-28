@@ -57,9 +57,9 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-router.post('/singin/game', async (req, res) => {
+router.post('/singup/game', async (req, res) => {
     console.log(req.body);
-    const { _username, _email, _password } = req.body;
+    const { _username, _email, _password, _method } = req.body;
 
     if (_password.length == 0) {
         // si no tiene contrase;a genera una aleatoria
@@ -69,15 +69,36 @@ router.post('/singin/game', async (req, res) => {
     const errors = [];
     const userAux = await Player.findOne({ email: _email });
     if (userAux) {
-        errors.push({ text: 'Este correo electronico ya se encuentra registrado.' })
-        res.json({ errors });
-        console.log('ya existente' + userAux);
+        if (_method == "Google") {
+            res.json(userAux);
+        } else {
+            errors.push({ text: 'Este correo electronico ya se encuentra registrado.' })
+            res.json({ errors });
+            console.log('ya existente' + userAux);
+        }
+        
     } else {
         const newPlayer = new Player({ username: _username, email: _email.toLowerCase(), password: _password });
         newPlayer.password = await newPlayer.encryptPassword(_password);
         await newPlayer.save();
 
         res.json(newPlayer);
+    }
+});
+
+router.post('/login/game', async (req, res) => {
+    console.log(req.body);
+    const { _email, _password } = req.body;
+    const player = await Player.findOne({ email: _email });
+    if (player) {
+        const match = await player.matchPassword(_password);
+        if (match) {
+            res.json(player);
+        } else {
+            res.send({ message: 'Email o clave incorrecta.' });
+        }
+    } else {
+        res.send({ message: 'Email o clave incorrecta.' });
     }
 });
 
