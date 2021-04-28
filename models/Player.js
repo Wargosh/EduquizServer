@@ -4,11 +4,20 @@ const { Schema } = mongoose;
 
 const PlayerSchema = new Schema({
     username:    { type: String, required: true },      // Nombre de usuario
+    image:       { type: String, required: false },     // Imagen
     email:       { type: String, required: true },      // Correo electronico
     password:    { type: String, required: true },      // Contrase;a
     status:      { type: String, default: 'active' },   // Estado usuario
     created_at:  { type: Date, default: Date.now },     // fecha creacion
-    updated_at:  { type: Date, default: Date.now }      // fecha actualizacion
+    updated_at:  { type: Date, default: Date.now },     // fecha actualizacion
+    // info de partidas
+    _points:     { type: Number, default: 0 },          // Puntos
+    _xp:         { type: Number, default: 0 },          // Experiencia
+    _level:      { type: Number, default: 1 },          // Nivel
+    _coins:      { type: Number, default: 0 }           // Monedas
+}, {
+    timestamps: true, // crea y controla las variables createdAt y updateAt
+    versionKey: false
 });
 
 // Encripta la contrase;a

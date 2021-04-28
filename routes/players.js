@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Player = require('../models/Player');
 const passport = require('passport');
+const shortid = require('shortid'); // genera ids aleatorios cortos
 
 // Mostrar vista de registrar una cuenta
 router.get('/signin', (req, res) => {
@@ -54,6 +55,30 @@ router.post('/login', passport.authenticate('local', {
 router.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/');
+});
+
+router.post('/singin/game', async (req, res) => {
+    console.log(req.body);
+    const { _username, _email, _password } = req.body;
+
+    if (_password.length == 0) {
+        // si no tiene contrase;a genera una aleatoria
+        let newPassword = shortid.generate();
+        _password = newPassword;
+    }
+    const errors = [];
+    const userAux = await Player.findOne({ email: _email });
+    if (userAux) {
+        errors.push({ text: 'Este correo electronico ya se encuentra registrado.' })
+        res.json({ errors });
+        console.log('ya existente' + userAux);
+    } else {
+        const newPlayer = new Player({ username: _username, email: _email.toLowerCase(), password: _password });
+        newPlayer.password = await newPlayer.encryptPassword(_password);
+        await newPlayer.save();
+
+        res.json(newPlayer);
+    }
 });
 
 module.exports = router;
