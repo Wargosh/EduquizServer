@@ -76,7 +76,6 @@ router.post('/singup/game', async (req, res) => {
             res.json({ errors });
             console.log('ya existente' + userAux);
         }
-        
     } else {
         const newPlayer = new Player({ username: _username, email: _email.toLowerCase(), password: _password });
         newPlayer.password = await newPlayer.encryptPassword(_password);

@@ -90,6 +90,7 @@ const io = SocketIO(server, {
 
 // config socketIO
 const Question = require('./models/Question');
+const Player = require('./models/Player');
 
 // Variables globales SOCKET.IO
 var players = [];
@@ -110,11 +111,34 @@ io.on('connection', (socket) => {
 
   socket.emit('connectionEstabilished', { id: thisPlayerId });
 
-  socket.on('chat', function (data) {
-    console.log('msg received: ' + data.user);
-    data.id = thisPlayerId;
+  // el jugador acaba de iniciar sesion
+  socket.on('player:online', async function (data) {
+    const p = await Player.findById(data.id_database);
+    if (p) {
+      p.status_player = "online";
+      await p.save();
+    }
+    players[thisPlayerId].username = data.username;
+    socket.join(data.username); // unirse a esta sala oyente de notificaciones personales
 
-    io.emit('chat', data);
+    socket.broadcast.emit('player:online', { id: thisPlayerId, user: data.username });
+  });
+
+  // almacenar en tiempo real los estados de las partidas jugadas
+  socket.on('player:status_hits', async function (data) {
+    const p = await Player.findById(data.id_database);
+    if (p) {
+      switch (data.status_hits) {
+        case "hit":
+          p._hits++;
+          break;
+        case "fail":
+          p._fails++;
+          break;
+      }
+      p.updated_at = Date.now();
+      await p.save();
+    }
   });
 
   socket.on('questions:get', async function () {
@@ -135,5 +159,13 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', function () {
     console.log('user disconnected');
+  });
+
+  // Cuando un jugador se desconecta
+  socket.on('disconnect', async function () {
+    // almacenar el estado de desconectado al jugador
+    await Player.findOneAndUpdate({ username: players[thisPlayerId].username }, { status_player: "offline" });
+    delete players[thisPlayerId];
+    console.log("player disconnected");
   });
 });

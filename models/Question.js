@@ -10,6 +10,9 @@ const QuestionSchema = new Schema({
     user:        { type: String, required: true }, // usuario que crea la pregunta.
     created_at:  { type: Date, default: Date.now }, // fecha creacion
     updated_at:  { type: Date, default: Date.now } // fecha actualizacion
+}, {
+    timestamps: true, // crea y controla las variables createdAt y updateAt
+    versionKey: false
 });
 
 module.exports = mongoose.model('Question', QuestionSchema);

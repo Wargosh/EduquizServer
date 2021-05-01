@@ -18,7 +18,7 @@ router.get('/questions', async (req, res) => {
     if (questions) {
         for (var i in questions) { // recorre los jugadores encontrados
             // establece un string temporal que menciona el ultimo acceso del mensaje
-            questions[i].timeAgo = helpers.timeago(Date.parse(questions[i].updated_at));
+            questions[i].timeAgo = helpers.timeago(Date.parse(questions[i].updatedAt));
             questions[i]._id = ""; // evita enviar el id a usuarios anonimos
         }
         console.log(questions);
@@ -53,7 +53,7 @@ router.get('/questions/my-questions', isAuthenticated, async (req, res) => {
     if (questions) {
         for (var i in questions) { // recorre los jugadores encontrados
             // establece un string temporal que menciona el ultimo acceso del mensaje
-            questions[i].timeAgo = helpers.timeago(Date.parse(questions[i].updated_at));
+            questions[i].timeAgo = helpers.timeago(Date.parse(questions[i].updatedAt));
         }
         res.render("questions/my-questions", {
             questions: questions
@@ -191,7 +191,7 @@ router.get('/questions/view-question/:id', isAuthenticated, async (req, res) => 
     // agregar el tiempo de registro (ultima modificacion)
     if (question) {
         // establece un string temporal que menciona el ultimo acceso del mensaje
-        question.timeAgo = helpers.timeago(Date.parse(question.updated_at));
+        question.timeAgo = helpers.timeago(Date.parse(question.updatedAt));
         res.render("questions/view-question", {
             questions: question
         });
@@ -253,8 +253,7 @@ router.put('/questions/update-question/:id', isAuthenticated, async (req, res) =
                     { option: _option3, status: false },
                     { option: _option4, status: false }],
                     images: images,
-                    category: _category,
-                    updated_at: Date.now()
+                    category: _category
                 });
 
                 req.flash('success_msg', 'Se ha actualizado la pregunta con exito.');
@@ -282,8 +281,7 @@ router.put('/questions/update-question/:id', isAuthenticated, async (req, res) =
             { option: _option2, status: op2Status },
             { option: _option3, status: false },
             { option: _option4, status: false }],
-            category: _category,
-            updated_at: Date.now()
+            category: _category
         });
 
         req.flash('success_msg', 'Se ha actualizado la pregunta con exito.');
