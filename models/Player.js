@@ -9,8 +9,6 @@ const PlayerSchema = new Schema({
     password:       { type: String, required: true },      // Contrase;a
     status_account: { type: String, default: 'active' },   // Estado de la cuenta de usuario
     status_player:  { type: String, default: 'offline' },  // Estado del jugador en el juego
-    created_at:     { type: Date, default: Date.now },     // fecha creacion
-    updated_at:     { type: Date, default: Date.now },     // fecha actualizacion
     // info de partidas
     _points:        { type: Number, default: 0 },          // Puntos
     _xp:            { type: Number, default: 0 },          // Experiencia

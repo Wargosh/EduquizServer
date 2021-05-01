@@ -136,29 +136,25 @@ io.on('connection', (socket) => {
           p._fails++;
           break;
       }
-      p.updated_at = Date.now();
       await p.save();
     }
   });
 
+  // almacenar la experiencia y nivel actualizado
+  socket.on('player:status_level', async function (data) {
+    await Player.findByIdAndUpdate(data.id_database, { _xp: data._XP, _level: data._level });
+    console.log("XP y nivel actualizado de: " + players[thisPlayerId].username);
+  });
+
+  // Devolver preguntas aleatorias
   socket.on('questions:get', async function () {
-    //const questions = await Question.find();
-    // Preguntas aleatorias
     const questions = await Question.aggregate([
       { $match: { status: 'active' } }, // filtrar los resultados
       { $sample: { size: 7 } } // Cantidad de documentos
     ]);
 
-    console.log('buscando preguntas');
+    console.log('buscando preguntas aleatorias');
     io.emit('questions:get', { questions });
-  });
-
-  socket.on('click', function () {
-    io.emit('click', { data: 'click' });
-  });
-
-  socket.on('disconnect', function () {
-    console.log('user disconnected');
   });
 
   // Cuando un jugador se desconecta

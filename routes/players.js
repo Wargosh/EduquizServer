@@ -59,7 +59,7 @@ router.get('/logout', (req, res) => {
 
 router.post('/singup/game', async (req, res) => {
     console.log(req.body);
-    const { _username, _email, _password, _method } = req.body;
+    const { _username, _email, _password, _image, _method } = req.body;
 
     if (_password.length == 0) {
         // si no tiene contrase;a genera una aleatoria
@@ -77,7 +77,7 @@ router.post('/singup/game', async (req, res) => {
             console.log('ya existente' + userAux);
         }
     } else {
-        const newPlayer = new Player({ username: _username, email: _email.toLowerCase(), password: _password });
+        const newPlayer = new Player({ username: _username, image: _image, email: _email.toLowerCase(), password: _password });
         newPlayer.password = await newPlayer.encryptPassword(_password);
         await newPlayer.save();
 
@@ -98,6 +98,20 @@ router.post('/login/game', async (req, res) => {
         }
     } else {
         res.send({ message: 'Email o clave incorrecta.' });
+    }
+});
+
+// Listar Ranking jugadores
+router.get('/players/ranking', async (req, res) => {
+    const players = await Player.find({ status_account: 'active' }, (err, docs) => {
+        if (err)
+            console.log('Error in retrieving ranking list :' + err);
+    }).sort({ _hits: 'asc' }).lean(); // It is prevent the warning when trying to display records
+
+    if (players) {
+        res.json({ players: players });
+    } else {
+        res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas' });
     }
 });
 

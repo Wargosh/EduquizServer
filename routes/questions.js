@@ -11,7 +11,7 @@ router.get('/questions', async (req, res) => {
     const questions = await Question.find((err, docs) => {
         if (err)
             console.log('Error in retrieving employee list :' + err);
-    }).sort({ updated_at: 'desc' }).lean(); // It is prevent the warning when trying to display records
+    }).sort({ updatedAt: 'desc' }).lean(); // It is prevent the warning when trying to display records
     
 
     // agregar el tiempo de registro (ultima modificacion)
@@ -47,7 +47,7 @@ router.get('/questions/my-questions', isAuthenticated, async (req, res) => {
     const questions = await Question.find({ user: req.user.id }, (err, docs) => {
         if (err)
             console.log('Error in retrieving employee list :' + err);
-    }).sort({ updated_at: 'desc' }).lean(); // It is prevent the warning when trying to display records
+    }).sort({ updatedAt: 'desc' }).lean(); // It is prevent the warning when trying to display records
 
     // agregar el tiempo de registro (ultima modificacion)
     if (questions) {
