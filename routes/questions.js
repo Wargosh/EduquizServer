@@ -6,13 +6,24 @@ const path = require('path');
 const { randomString } = require('../helpers/libs');
 const { isAuthenticated } = require('../helpers/auth');
 
+// Para subir archivos a AWS S3
+const AWS = require('aws-sdk');
+const fs_aws = require('fs');
+
+// configurar AWS con las claves de acceso
+const s3 = new AWS.S3({
+    accessKeyId: "AKIAQQDX6GYZQJGCARVH",
+    secretAccessKey: "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",
+    region: 'us-east-2'
+});
+
 // Listar TODAS preguntas
 router.get('/questions', async (req, res) => {
     const questions = await Question.find((err, docs) => {
         if (err)
             console.log('Error in retrieving employee list :' + err);
     }).sort({ updatedAt: 'desc' }).lean(); // It is prevent the warning when trying to display records
-    
+
 
     // agregar el tiempo de registro (ultima modificacion)
     if (questions) {
@@ -125,37 +136,44 @@ router.post('/questions/new-question', isAuthenticated, async (req, res) => {
             const imageTempPath = req.file.path; // ruta donde se encuentra el archivo
 
             if (ext === '.png' || ext === '.jpg' || ext === '.jpeg') {
-                const imgURL = randomString(); // Obtener id aleatorio
-                //verifica si ya existe un nombre igual...
-                //const match = await Image.findOne({ filename: { $regex: imgURL } });
-                //if (match) {
-                //    saveImage();
-                //} else {
-                const targetPath = path.resolve('public/upload/questions/' + imgURL + ext); // ruta donde moverlo + nuevo nombre.ext
                 const errors = [];
                 console.log(req.file);
-                await fs.rename(imageTempPath, targetPath, function (err) {
+
+                // subir imagen a AWS
+                var params = {
+                    Bucket: 'eduquiz-s3-files',
+                    Body: fs.createReadStream(imageTempPath),
+                    Key: "images/questions/" + Date.now() + "_" + path.basename(imageTempPath + ext),
+                    ACL: 'public-read'
+                };
+
+                s3.upload(params, async function (err, data) {
+                    //handle error
                     if (err) {
-                        errors.push({ text: 'No se pudo subir la imagen al servidor.' });
+                        console.log("Error", err);
+                        req.flash('error_msg', 'Ha ocurrido un error al momento de subir la imagen.');
+                        // Recargar misma pagina con los datos
+                        res.render('questions/new-question', {
+                            errors, _question, _option1, _option2, _option3, _option4, _category
+                        });
+                    }
+                    //success
+                    if (data) {
+                        // guardar ruta de imagen en arreglo
+                        images.push(data.Location);
+                        console.log("Uploaded in:", data.Location);
+
+                        const newQuestion = new Question({ question, images, category, options });
+                        newQuestion.user = req.user.id;
+                        console.log(newQuestion);
+                        await newQuestion.save();
+
+                        req.flash('success_msg', 'Se ha almacenado exitosamente tu pregunta.');
+                        res.redirect('/questions/my-questions');
                     }
                 });
-
-                if (errors.length > 0) {
-                    req.flash('error_msg', 'No se pudo subir la imagen al servidor.');
-                } else {
-                    // guardar imagen en arreglo
-                    images.push(imgURL + ext);
-
-                    const newQuestion = new Question({ question, images, category, options });
-                    newQuestion.user = req.user.id;
-                    console.log(newQuestion);
-                    await newQuestion.save();
-
-                    req.flash('success_msg', 'Se ha almacenado exitosamente tu pregunta.');
-                }
-                res.redirect('/questions/my-questions');
             } else {
-                await fs.unlink(imageTempPath);
+                //await fs.unlink(imageTempPath);
                 req.flash('error_msg', 'Solo puedes subir archivos en formato .PNG .JPG.');
                 // Recargar misma pagina con los datos
                 res.render('questions/new-question', {
@@ -185,7 +203,7 @@ router.post('/questions/new-question', isAuthenticated, async (req, res) => {
 router.get('/questions/view-question/:id', isAuthenticated, async (req, res) => {
     const question = await Question.findById(req.params.id, (err, docs) => {
         if (err)
-            console.log('Error in retrieving employee list :' + err);
+            console.log('Ocurrio un error al buscar la pregunta (Update View): ' + err);
     }).lean(); // It is prevent the warning when trying to display records
 
     // agregar el tiempo de registro (ultima modificacion)
@@ -215,52 +233,66 @@ router.put('/questions/update-question/:id', isAuthenticated, async (req, res) =
         op2Status = true;
     }
 
-    const question = await Question.findById(req.params.id, (err, docs) => {
-        if (err)
-            console.log('Error in retrieving employee list :' + err);
-    }).lean();
+    /*const question = await Question.findById(req.params.id, (err, docs) => {
+        if (err) {
+            req.flash('error_msg', 'Error: No se encontro la pregunta, por favor intente de nuevo.');
+            // Recargar misma pagina con los datos
+            res.render('questions/view-question', {
+                _question, _option1, _option2, _option3, _option4, _category
+            });
+            console.log('Error: No se encontro la pregunta: ' + err);
+        }
+
+    }).lean();*/
 
     const saveImage = async () => {
         const ext = path.extname(req.file.originalname).toLowerCase();
         const imageTempPath = req.file.path; // ruta donde se encuentra el archivo
 
-        if (question.images[0] !== undefined) {
-            await fs.unlink(path.resolve('./public/upload/questions/' + question.images[0])); // elimina el archivo del servidor
-            console.log('eliminando imagen antigua');
-        }
-
         if (ext === '.png' || ext === '.jpg' || ext === '.jpeg') {
-            const imgURL = randomString(); // Obtener id aleatorio
-            const targetPath = path.resolve('public/upload/questions/' + imgURL + ext); // ruta donde moverlo + nuevo nombre.ext
             const errors = [];
             console.log(req.file);
-            await fs.rename(imageTempPath, targetPath, function (err) {
+
+            // subir imagen a AWS
+            var params = {
+                Bucket: 'eduquiz-s3-files',
+                Body: fs.createReadStream(imageTempPath),
+                Key: "images/questions/" + Date.now() + "_" + path.basename(imageTempPath + ext),
+                ACL: 'public-read'
+            };
+
+            s3.upload(params, async function (err, data) {
+                //handle error
                 if (err) {
-                    errors.push({ text: 'No se pudo subir la imagen al servidor.' });
+                    console.log("Error", err);
+                    req.flash('error_msg', 'Ha ocurrido un error al momento de subir la imagen al servidor.');
+                    // Recargar misma pagina con los datos
+                    res.render('questions/view-question', {
+                        errors, _question, _option1, _option2, _option3, _option4, _category
+                    });
+                }
+                //success
+                if (data) {
+                    // guardar ruta de imagen en arreglo
+                    images.push(data.Location);
+                    console.log("Uploaded in:", data.Location);
+
+                    await Question.findByIdAndUpdate(req.params.id, {
+                        question: _question,
+                        options: [{ option: _option1, status: true },
+                        { option: _option2, status: op2Status },
+                        { option: _option3, status: false },
+                        { option: _option4, status: false }],
+                        images: images,
+                        category: _category
+                    });
+
+                    req.flash('success_msg', 'Se ha actualizado la pregunta con exito.');
+                    res.redirect('/questions/my-questions');
                 }
             });
-
-            if (errors.length > 0) {
-                req.flash('error_msg', 'No se pudo subir la imagen al servidor.');
-            } else {
-                // guardar imagen en arreglo
-                images.push(imgURL + ext);
-
-                await Question.findByIdAndUpdate(req.params.id, {
-                    question: _question,
-                    options: [{ option: _option1, status: true },
-                    { option: _option2, status: op2Status },
-                    { option: _option3, status: false },
-                    { option: _option4, status: false }],
-                    images: images,
-                    category: _category
-                });
-
-                req.flash('success_msg', 'Se ha actualizado la pregunta con exito.');
-            }
-            res.redirect('/questions/my-questions');
         } else {
-            await fs.unlink(imageTempPath);
+            //await fs.unlink(imageTempPath);
             req.flash('error_msg', 'Solo puedes subir archivos en formato .PNG .JPG.');
             // Recargar misma pagina con los datos
             res.render('questions/view-question', {
@@ -298,7 +330,7 @@ router.delete('/questions/remove-question/:id', isAuthenticated, async (req, res
 
     if (question.images[0] !== undefined) {
         // De existir, elimina las imagenes de la pregunta ubicadas en el servidor
-        await fs.unlink(path.resolve('./public/upload/questions/' + question.images[0])); // elimina el archivo del servidor
+        //await fs.unlink(path.resolve('./public/upload/questions/' + question.images[0])); // elimina el archivo del servidor
     }
 
     await Question.findByIdAndDelete(req.params.id);

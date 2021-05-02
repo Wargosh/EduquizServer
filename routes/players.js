@@ -103,7 +103,7 @@ router.post('/login/game', async (req, res) => {
 
 // Listar Ranking jugadores
 router.get('/players/ranking', async (req, res) => {
-    const players = await Player.find({ status_account: 'active' }, (err, docs) => {
+    const players = await Player.find({ status_account: 'active', _hits: { $gt: 0 } }, (err, docs) => {
         if (err)
             console.log('Error in retrieving ranking list :' + err);
     }).sort({ _hits: 'desc' }).limit(30).lean(); // It is prevent the warning when trying to display records
