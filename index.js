@@ -146,8 +146,8 @@ io.on('connection', (socket) => {
     console.log("XP y nivel actualizado de: " + players[thisPlayerId].username);
   });
 
-  // Devolver preguntas aleatorias
-  socket.on('questions:get', async function () {
+  // Devolver preguntas aleatorias (Envia a todos los clientes las preguntas)
+  /*socket.on('questions:get', async function () {
     const questions = await Question.aggregate([
       { $match: { status: 'active' } }, // filtrar los resultados
       { $sample: { size: 7 } } // Cantidad de documentos
@@ -155,7 +155,7 @@ io.on('connection', (socket) => {
 
     console.log('buscando preguntas aleatorias');
     io.emit('questions:get', { questions });
-  });
+  });*/
 
   // Cuando un jugador se desconecta
   socket.on('disconnect', async function () {

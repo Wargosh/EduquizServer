@@ -41,18 +41,6 @@ router.get('/questions', async (req, res) => {
     }
 });
 
-router.get('/getRandomQuestions', async (req, res) => {
-    const questions = await Question.aggregate([
-        { $match: { status: 'active' } }, // filtrar los resultados
-        { $sample: { size: 7 } } // Cantidad de documentos
-    ]);
-
-    res.render("questions/my-questions", {
-        questions: questions
-    });
-    //res.send({ questions: questions });
-});
-
 // Listar mis preguntas
 router.get('/questions/my-questions', isAuthenticated, async (req, res) => {
     const questions = await Question.find({ user: req.user.id }, (err, docs) => {
@@ -336,6 +324,30 @@ router.delete('/questions/remove-question/:id', isAuthenticated, async (req, res
     await Question.findByIdAndDelete(req.params.id);
     req.flash('success_msg', 'Se ha eliminado la pregunta correctamente.');
     res.redirect('/questions/my-questions');
+});
+
+// Juego 
+// Obtener preguntas aleatorias
+router.post('/questions/random', async (req, res) => {
+    console.log(req.body);
+    const { _count, _category } = req.body;
+    let questions = undefined;
+    if (_category == '') {
+        questions = await Question.aggregate([
+            { $match: { status: 'active' } }, // filtrar los resultados
+            { $sample: { size: parseInt(_count) } } // Cantidad de documentos
+        ]);
+    } else {
+        questions = await Question.aggregate([
+            { $match: { status: 'active', category: _category } }, // filtrar los resultados
+            { $sample: { size: parseInt(_count) } } // Cantidad de documentos
+        ]);
+    }
+
+    if (questions)
+        res.json({ questions });
+    else
+        res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas aleatorias.' });
 });
 
 module.exports = router;

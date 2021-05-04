@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Player = require('../models/Player');
 const passport = require('passport');
 const shortid = require('shortid'); // genera ids aleatorios cortos
+const helpers = require('../helpers');
 
 // Mostrar vista de registrar una cuenta
 router.get('/signin', (req, res) => {
@@ -110,6 +111,23 @@ router.get('/players/ranking', async (req, res) => {
 
     if (players) {
         res.json({ players: players });
+    } else {
+        res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas' });
+    }
+});
+
+// informacion de perfil jugador
+router.get('/player/profile/:id', async (req, res) => {
+    const player = await Player.findById(req.params.id, (err, docs) => {
+        if (err)
+            res.send({ error: 'Ha ocurrido un error al buscar el usuario.' });
+    }).lean();
+
+    if (player) {
+        // establece un string temporal que menciona el ultimo acceso del mensaje
+        player.timeAgo = helpers.timeago(Date.parse(player.updatedAt));
+        player.password = '';
+        res.json(player);
     } else {
         res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas' });
     }
