@@ -350,4 +350,39 @@ router.post('/questions/random', async (req, res) => {
         res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas aleatorias.' });
 });
 
+// Obtener estadisticas preguntas
+router.get('/questions/count', async (req, res) => {
+    const _category = ['Astronomía', 'Ciencia', 'Deporte', 'Entretenimiento', 'Fisica', 'Geografía', 'Historia', 'Literatura', 'Matemáticas', 'Música'];
+    const countCategories = [];
+
+    const countAll = await Question.find().countDocuments();
+    for (let i = 0; i < _category.length; i++) {
+        const count = await Question.find({ category: _category[i] }).countDocuments();
+        const json = { category: _category[i], count: count }
+        countCategories.push(json);
+    }
+
+    if (countAll)
+        res.json({ total: countAll, countCategories: countCategories });
+    else
+        res.send({ error: 'Ha ocurrido un error al intentar obtener las estadisticas de las preguntas.' });
+});
+
+// Obtener preguntas con respuesta condicional para el modo de juego dw
+router.post('/questions/fordecodeword', async (req, res) => {
+    const { _count } = req.body;
+    //const questions = await Question.find({ "options.option": /^[\s\S]{3,7}$/, "options.status": true });
+    const questions = await Question.aggregate([
+        { $match: { status: 'active', "options.option": /^[\s\S]{3,7}$/, "options.status": true } }, // filtrar los resultados
+        { $sample: { size: parseInt(_count) } } // Cantidad de documentos
+    ]);
+    //const questions = await Question.where("this.options.status == true && this.options.option.length >= 3 && this.options.option.length <= 7")
+    //const questions = await Question.find({ "options.option": { $regex: /^.{3,7}$/ }/*, "options.status": true*/ })
+
+    if (questions)
+        res.json({ questions });
+    else
+        res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas.' });
+});
+
 module.exports = router;
