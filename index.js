@@ -140,9 +140,9 @@ io.on('connection', (socket) => {
     }
   });
 
-  // almacenar la experiencia y nivel actualizado
+  // almacenar la experiencia, nivel actualizado y monedas
   socket.on('player:status_level', async function (data) {
-    await Player.findByIdAndUpdate(data.id_database, { _xp: data._XP, _level: data._level });
+    await Player.findByIdAndUpdate(data.id_database, { _xp: data._XP, _level: data._level, _coins: data._coins });
     console.log("XP y nivel actualizado de: " + players[thisPlayerId].username);
   });
 
