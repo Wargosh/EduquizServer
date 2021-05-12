@@ -121,7 +121,7 @@ io.on('connection', (socket) => {
     players[thisPlayerId].username = data.username;
     socket.join(data.username); // unirse a esta sala oyente de notificaciones personales
 
-    socket.broadcast.emit('player:online', { id: thisPlayerId, user: data.username });
+    socket.broadcast.emit('player:online', { id: thisPlayerId, idDB: p._id, user: data.username });
   });
 
   // almacenar en tiempo real los estados de las partidas jugadas
