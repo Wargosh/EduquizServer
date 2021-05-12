@@ -160,8 +160,9 @@ io.on('connection', (socket) => {
   // Cuando un jugador se desconecta
   socket.on('disconnect', async function () {
     // almacenar el estado de desconectado al jugador
-    await Player.findOneAndUpdate({ username: players[thisPlayerId].username }, { status_player: "offline" });
+    const p = await Player.findOneAndUpdate({ username: players[thisPlayerId].username }, { status_player: "offline" });
     delete players[thisPlayerId];
+    socket.broadcast.emit('disconnected', { id: thisPlayerId, idDB: p._id, user: p.username });
     console.log("player disconnected");
   });
 });
