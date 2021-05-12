@@ -90,6 +90,7 @@ const io = SocketIO(server, {
 
 // config socketIO
 const Question = require('./models/Question');
+const Friend = require('./models/Friend');
 const Player = require('./models/Player');
 
 // Variables globales SOCKET.IO
@@ -146,16 +147,51 @@ io.on('connection', (socket) => {
     console.log("XP y nivel actualizado de: " + players[thisPlayerId].username);
   });
 
-  // Devolver preguntas aleatorias (Envia a todos los clientes las preguntas)
-  /*socket.on('questions:get', async function () {
-    const questions = await Question.aggregate([
-      { $match: { status: 'active' } }, // filtrar los resultados
-      { $sample: { size: 7 } } // Cantidad de documentos
-    ]);
+  /* ***************** Amigos y Solicitudes ***************** */
 
-    console.log('buscando preguntas aleatorias');
-    io.emit('questions:get', { questions });
-  });*/
+  // almacecna la solicitud de amistad e informa al jugador dirigido
+  socket.on('player:save_friend_request', async function (data) {
+    const newFriend = new Friend();
+    newFriend.user_first = data.user_first;
+    newFriend.user_second = data.user_second;
+    newFriend.status = 0; // solicitud
+    const str1 = shortid.generate();
+    const str2 = shortid.generate();
+    newFriend.private_room = str1 + str2;
+
+    await newFriend.save();
+
+    socket.join(data.user_second); // entrar a la sala privada de notificaciones del jugador
+    io.to(data.user_second).emit('player:update_all_request', { user_request: data.user_first });
+    socket.leave(data.user_second); // salir de la sala una vez que se ha enviado la solicitud
+  });
+
+  // almacecena la amistad e informa al jugador dirigido
+  socket.on('player:save_friend', async function (data) {
+    const fr = await Friend.findById(data.id_request);
+    if (fr) {
+      fr.status = 1; // amigo
+      await fr.save();
+
+      socket.join(data.user); // entrar a la sala privada de notificaciones del jugador
+      io.to(data.user).emit('player:update_all_request', { user_request: data.user });
+      socket.leave(data.user); // salir de la sala una vez que se ha enviado la solicitud
+    }
+  });
+
+  // almacecena la amistad e informa al jugador dirigido
+  socket.on('player:remove_friendship', async function (data) {
+    const fr = await Friend.findById(data.id_request);
+    if (fr) {
+      fr.remove();
+      socket.join(data.user); // entrar a la sala privada de notificaciones del jugador
+      io.to(data.user).emit('player:update_all_request', { user_request: data.user });
+      socket.leave(data.user); // salir de la sala una vez que se ha enviado la solicitud
+    } else
+      console.log("Ha ocurrido un error al intentar borrar la solicitud.");
+  });
+
+  /* ***************** Desconexión del jugador ***************** */
 
   // Cuando un jugador se desconecta
   socket.on('disconnect', async function () {

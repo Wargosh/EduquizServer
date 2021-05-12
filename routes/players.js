@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Player = require('../models/Player');
+const Friend = require('../models/Friend');
 const passport = require('passport');
 const shortid = require('shortid'); // genera ids aleatorios cortos
 const helpers = require('../helpers');
@@ -130,6 +131,32 @@ router.get('/player/profile/:id', async (req, res) => {
         res.json(player);
     } else {
         res.send({ error: 'Ha ocurrido un error al intentar obtener las preguntas' });
+    }
+});
+
+router.post('/player/search', async(req, res) => {
+    const { username } = req.body;
+    const players = await Player.find({ 'username': new RegExp(username, 'i') }).limit(25);
+    if (players) {
+        for (var i in players) { // recorre los jugadores encontrados
+            // establece un string temporal que menciona el ultimo acceso del jugador
+            players[i].set('timeAgo', helpers.timeago(Date.parse(players[i].updatedAt)), { strict: false });
+            players[i].password = '';
+        }
+        res.json(players);
+    } else {
+        res.send({ error: 'Ha ocurrido un error al intentar obtener el listado de usuarios' });
+    }
+});
+
+// Obtiene la lista de solicitudes de amistad
+router.post('/player/all_request', async(req, res) => {
+    const { id_database } = req.body;
+    const friendRequests = await Friend.find({ $or: [{ user_first: id_database }, { user_second: id_database }] });
+    if (friendRequests) {
+        res.json({ friendRequests });
+    } else {
+        res.send({ error: 'Ha ocurrido un error al intentar obtener el listado de todas las solicitudes' });
     }
 });
 
