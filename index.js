@@ -120,7 +120,7 @@ io.on('connection', (socket) => {
       await p.save();
     }
     players[thisPlayerId].username = data.username;
-    socket.join(data.username); // unirse a esta sala oyente de notificaciones personales
+    socket.join(p._id); // unirse a esta sala oyente de notificaciones personales
 
     socket.broadcast.emit('player:online', { id: thisPlayerId, idDB: p._id, user: data.username });
   });
@@ -162,7 +162,7 @@ io.on('connection', (socket) => {
     await newFriend.save();
 
     socket.join(data.user_second); // entrar a la sala privada de notificaciones del jugador
-    io.to(data.user_second).emit('player:update_all_request', { user_request: data.user_first });
+    io.to(data.user_second).emit('player:notify_request', { user_request: data.user_first });
     socket.leave(data.user_second); // salir de la sala una vez que se ha enviado la solicitud
   });
 
@@ -173,9 +173,9 @@ io.on('connection', (socket) => {
       fr.status = 1; // amigo
       await fr.save();
 
-      socket.join(data.user); // entrar a la sala privada de notificaciones del jugador
-      io.to(data.user).emit('player:update_all_request', { user_request: data.user });
-      socket.leave(data.user); // salir de la sala una vez que se ha enviado la solicitud
+      socket.join(fr.user_first); // entrar a la sala privada de notificaciones del jugador
+      io.to(fr.user_first).emit('player:notify_new_friend', { user_friend: data.user_friend });
+      socket.leave(fr.user_first); // salir de la sala una vez que se ha enviado la solicitud
     }
   });
 
@@ -184,9 +184,9 @@ io.on('connection', (socket) => {
     const fr = await Friend.findById(data.id_request);
     if (fr) {
       fr.remove();
-      socket.join(data.user); // entrar a la sala privada de notificaciones del jugador
-      io.to(data.user).emit('player:update_all_request', { user_request: data.user });
-      socket.leave(data.user); // salir de la sala una vez que se ha enviado la solicitud
+      socket.join(data.id_removed); // entrar a la sala privada de notificaciones del jugador
+      io.to(data.id_removed).emit('player:notify_remove_friend');
+      socket.leave(data.id_removed); // salir de la sala una vez que se ha enviado la solicitud
     } else
       console.log("Ha ocurrido un error al intentar borrar la solicitud.");
   });
@@ -198,6 +198,7 @@ io.on('connection', (socket) => {
     // almacenar el estado de desconectado al jugador
     const p = await Player.findOneAndUpdate({ username: players[thisPlayerId].username }, { status_player: "offline" });
     delete players[thisPlayerId];
+    socket.leave(p._id); // salir de la sala
     socket.broadcast.emit('disconnected', { id: thisPlayerId, idDB: p._id, user: p.username });
     console.log("player disconnected");
   });
