@@ -161,9 +161,9 @@ io.on('connection', (socket) => {
 
     await newFriend.save();
 
-    socket.join(data.user_second); // entrar a la sala privada de notificaciones del jugador
+    //socket.join(data.user_second); // entrar a la sala privada de notificaciones del jugador
     io.to(data.user_second).emit('player:notify_request', { user_request: data.user_first });
-    socket.leave(data.user_second); // salir de la sala una vez que se ha enviado la solicitud
+    //socket.leave(data.user_second); // salir de la sala una vez que se ha enviado la solicitud
   });
 
   // almacecena la amistad e informa al jugador dirigido
@@ -173,9 +173,9 @@ io.on('connection', (socket) => {
       fr.status = 1; // amigo
       await fr.save();
 
-      socket.join(fr.user_first); // entrar a la sala privada de notificaciones del jugador
+      //socket.join(fr.user_first); // entrar a la sala privada de notificaciones del jugador
       io.to(fr.user_first).emit('player:notify_new_friend', { user_friend: data.user_friend });
-      socket.leave(fr.user_first); // salir de la sala una vez que se ha enviado la solicitud
+      //socket.leave(fr.user_first); // salir de la sala una vez que se ha enviado la solicitud
     }
   });
 
@@ -184,9 +184,9 @@ io.on('connection', (socket) => {
     const fr = await Friend.findById(data.id_request);
     if (fr) {
       fr.remove();
-      socket.join(data.id_removed); // entrar a la sala privada de notificaciones del jugador
+      //socket.join(data.id_removed); // entrar a la sala privada de notificaciones del jugador
       io.to(data.id_removed).emit('player:notify_remove_friend');
-      socket.leave(data.id_removed); // salir de la sala una vez que se ha enviado la solicitud
+      //socket.leave(data.id_removed); // salir de la sala una vez que se ha enviado la solicitud
     } else
       console.log("Ha ocurrido un error al intentar borrar la solicitud.");
   });
