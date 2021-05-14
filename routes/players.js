@@ -160,4 +160,22 @@ router.post('/player/all_request', async(req, res) => {
     }
 });
 
+// Obtiene una lista de perfiles de amigos
+router.post('/player/get_profiles', async(req, res) => {
+    console.log(req.body);
+    const { ids_friends } = req.body;
+    var ids = ids_friends.split(",");
+    const listFriends = await Player.find({ '_id': { $in: ids } }).sort({ updatedAt: 'desc' });
+    if (listFriends) {
+        for (var i in listFriends) { // recorre los jugadores encontrados
+            // establece un string temporal que menciona el ultimo acceso del jugador
+            listFriends[i].set('timeAgo', helpers.timeago(Date.parse(listFriends[i].updatedAt)), { strict: false });
+            listFriends[i].password = '';
+        }
+        res.json({ listFriends });
+    } else {
+        res.send({ error: 'Ha ocurrido un error al intentar obtener el listado de amigos' });
+    }
+});
+
 module.exports = router;

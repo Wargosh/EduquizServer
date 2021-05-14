@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 
 const PlayerSchema = new Schema({
     username:           { type: String, required: true },      // Nombre de usuario
+    tittle:             { type: String, required: false},      // Titulo del jugador
     image:              { type: String, required: false },     // Imagen
     email:              { type: String, required: true },      // Correo electronico
     password:           { type: String, required: true },      // Contrase;a
