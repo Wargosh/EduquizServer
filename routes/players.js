@@ -160,7 +160,7 @@ router.post('/player/all_request', async(req, res) => {
     }
 });
 
-// Obtiene una lista de perfiles de amigos
+// Obtiene una lista de perfiles en conjunto
 router.post('/player/get_profiles', async(req, res) => {
     console.log(req.body);
     const { ids_friends } = req.body;
