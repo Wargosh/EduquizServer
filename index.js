@@ -173,22 +173,44 @@ io.on('connection', (socket) => {
       fr.status = 1; // amigo
       await fr.save();
 
-      //socket.join(fr.user_first); // entrar a la sala privada de notificaciones del jugador
       io.to(fr.user_first).emit('player:notify_new_friend', { user_friend: data.user_friend });
-      //socket.leave(fr.user_first); // salir de la sala una vez que se ha enviado la solicitud
     }
   });
 
-  // almacecena la amistad e informa al jugador dirigido
+  // almacena la amistad e informa al jugador dirigido
   socket.on('player:remove_friendship', async function (data) {
     const fr = await Friend.findById(data.id_request);
     if (fr) {
       fr.remove();
-      //socket.join(data.id_removed); // entrar a la sala privada de notificaciones del jugador
       io.to(data.id_removed).emit('player:notify_remove_friend');
-      //socket.leave(data.id_removed); // salir de la sala una vez que se ha enviado la solicitud
     } else
       console.log("Ha ocurrido un error al intentar borrar la solicitud.");
+  });
+
+  /* ************************** CHAT *************************** */
+
+  socket.on('chat:join_room', function (data) {
+    console.log('user join to chat room: ' + data.id_request);
+    socket.join(data.id_request);
+  });
+
+  socket.on('chat:messageToUser', async function (data) {
+    console.log('nuevo mensaje: ' + data);
+    const fr = await Friend.findById(data.id_request);
+    if (fr) {
+      const msgChat = { user: data.user, message: data.message, is_read: false, created_at: Date.now() };
+      fr.chat.push(msgChat);
+      await fr.save();
+
+      // envia a la room del usuario quien recibe el mensaje
+      io.to(data.id_request).emit('chat:messageUser', data);
+    } else
+      console.log("Ha ocurrido un error al enviar un mensaje.");
+  });
+
+  socket.on('chat:typing', (data) => {
+    // envia a la room del usuario quien recibe el mensaje
+    socket.broadcast.to(data.id_request).emit('chat:typing', data);
   });
 
   /* ***************** Desconexión del jugador ***************** */

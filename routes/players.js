@@ -134,7 +134,7 @@ router.get('/player/profile/:id', async (req, res) => {
     }
 });
 
-router.post('/player/search', async(req, res) => {
+router.post('/player/search', async (req, res) => {
     const { username } = req.body;
     const players = await Player.find({ 'username': new RegExp(username, 'i') }).limit(25);
     if (players) {
@@ -150,10 +150,18 @@ router.post('/player/search', async(req, res) => {
 });
 
 // Obtiene la lista de solicitudes de amistad
-router.post('/player/all_request', async(req, res) => {
+router.post('/player/all_request', async (req, res) => {
     const { id_database } = req.body;
     const friendRequests = await Friend.find({ $or: [{ user_first: id_database }, { user_second: id_database }] });
     if (friendRequests) {
+        for (var i in friendRequests) { // recorre los jugadores encontrados
+            // establece un string temporal que menciona el ultimo acceso del jugador
+            for (var j in friendRequests[i].chat) { // recorre los jugadores encontrados
+                // establece un string temporal que menciona el ultimo acceso del jugador
+                friendRequests[i].chat[j].set('timeAgo', helpers.timeago(Date.parse(friendRequests[i].chat[j].created_at)), { strict: false });
+            }
+        }
+
         res.json({ friendRequests });
     } else {
         res.send({ error: 'Ha ocurrido un error al intentar obtener el listado de todas las solicitudes' });
@@ -161,7 +169,7 @@ router.post('/player/all_request', async(req, res) => {
 });
 
 // Obtiene una lista de perfiles en conjunto
-router.post('/player/get_profiles', async(req, res) => {
+router.post('/player/get_profiles', async (req, res) => {
     console.log(req.body);
     const { ids_friends } = req.body;
     var ids = ids_friends.split(",");

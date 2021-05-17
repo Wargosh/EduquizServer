@@ -6,6 +6,7 @@ const FriendSchema = new Schema({
     user_second: { type: String, required: true }, // usuario a quien va dirigido
     private_room: { type: String, required: true }, // cadena utilizada para la comunicación entre ambos usuarios
     status: { type: Number, required: true, default: 0 }, // [0=solicitud, 1=amigos, 3=bloqueo]
+    chat: [{ user: String, message: String, is_read: Boolean, created_at: Date }], // informacion de mensajes privados enviados
 }, {
     timestamps: true, // crea y controla las variables createdAt y updateAt
     versionKey: false
